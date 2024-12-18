@@ -8,7 +8,7 @@ using WebSocketSharp;
 
 public class grab : MonoBehaviour
 {
-    public string esp32WebSocketUrl = "ws://192.168.117.200:81"; // Replace with your ESP32 IP and WebSocket port
+    public string esp32WebSocketUrl = "ws://192.168.0.12:81"; // Replace with your ESP32 IP and WebSocket port
     private WebSocket webSocket;
 
     private float left_index_degree = 0;
@@ -35,6 +35,12 @@ public class grab : MonoBehaviour
 
     // Thread-safe queue for main thread actions
     private ConcurrentQueue<Action> mainThreadActions = new ConcurrentQueue<Action>();
+
+    private float ClampRotation(float value, float min, float max)
+    {
+        return Mathf.Clamp(value, min, max);
+    }
+
 
     void Start()
     {
@@ -128,29 +134,35 @@ public class grab : MonoBehaviour
             switch (serialOutputs[1])
             {
                 case "Index":
+                    val = ClampRotation(val, -30f, 120f); // Lock rotation to 0° - 90°
                     RotateFinger(left_index, val - left_index_degree);
                     left_index_degree = val;
                     break;
 
                 case "Middle":
+                    val = ClampRotation(val, 0f, 90f);
                     RotateFinger(left_middle, val - left_middle_degree);
                     left_middle_degree = val;
                     break;
 
                 case "Ring":
+                    val = ClampRotation(val, -30f, 120f);
                     RotateFinger(left_ring, val - left_ring_degree);
                     left_ring_degree = val;
                     break;
 
                 case "Pinky":
+                    val = ClampRotation(val, -30f, 120f);
                     RotateFinger(left_pinky, val - left_pinky_degree);
                     left_pinky_degree = val;
                     break;
 
                 case "Thumb":
+                    val = ClampRotation(val, -30f, 110f);
                     RotateFinger(left_thumb, val - left_thumb_degree);
                     left_thumb_degree = val;
                     break;
+
 
                 case "RotateX":
                     RotateHand(left_hand, val - left_hand_rot[0], 0, 0); // Adjust axis mapping
